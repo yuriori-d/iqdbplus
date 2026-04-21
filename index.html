@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>iqdb+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+    --card-bg: rgba(0, 0, 0, 0.45);
+    --card-radius: 20px;
+    --card-shadow: 0 18px 40px rgba(0, 0, 0, 0.30);
+    --accent: #6C4DFF;
+    --accent-hover: #7c5dff;
+    --text-main: #ffffff;
+    --text-muted: #cccccc;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    color: var(--text-main);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #05060a;
+    overflow-x: hidden;
+}
+
+.page-root {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.bg-image {
+    position: absolute;
+    inset: 0;
+    background-image: url("https://files.yande.re/image/3416edf8138ad271771cc89351995029/yande.re%20852783%20iranon_%28new_iranon%29%20mishaguji%20moriya_suwako%20touhou.jpg");
+    background-size: 110%;
+    background-position: -200px top;
+    background-repeat: no-repeat;
+    z-index: 1;
+    transition: background-image 0.4s ease;
+}
+
+.bg-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+}
+
+.bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.7) 100%);
+    z-index: 2;
+}
+
+.content-layer {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    min-height: 100vh;
+    padding: 24px 20px 70px;
+}
+
+.top-badge {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+}
+
+.main-layout {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+}
+
+.card-wrapper {
+    margin: 0 auto;
+    width: 420px;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.card {
+    width: 100%;
+    background: var(--card-bg);
+    backdrop-filter: blur(40px) saturate(1.4);
+    -webkit-backdrop-filter: blur(40px) saturate(1.4);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-title span.version {
+    opacity: 0.7;
+    font-weight: 400;
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.card-header button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.card-body {
+    padding: 22px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.hint-text {
+    font-size: 13px;
+    color: #e4e4e4;
+}
+
+.upload-box {
+    border-radius: 16px;
+    border: 1px dashed #eaeaea;
+    background: rgba(255,255,255,0.08);
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.upload-box:hover {
+    background: rgba(255,255,255,0.16);
+    border-color: #ddd;
+}
+
+.upload-icon {
+    font-size: 26px;
+    opacity: 0.6;
+}
+
+.upload-box input[type="file"] { display: none; }
+
+.upload-btn {
+    position: absolute;
+    bottom: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.4);
+    color: #000;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.input-wrapper label {
+    font-size: 13px;
+    color: #eaeaea;
+}
+
+.text-input {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid #dddddd;
+    padding: 9px 14px;
+    font-size: 14px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.btn-primary {
+    width: 100%;
+    border-radius: 999px;
+    border: none;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: #ffffff;
+    background: var(--accent);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    margin-top: 10px;
+}
+
+.btn-primary:hover { background: var(--accent-hover); }
+
+.card-footer-text {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #e4e4e4;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+.about-text {
+    font-size: 13px;
+    color: #f2f2f2;
+    line-height: 1.5;
+}
+
+.btn-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    width: fit-content;
+}
+
+.btn-github:hover {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.45);
+}
+
+.bg-changer {
+    margin-top: 6px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bg-changer-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e0e0e0;
+}
+
+.bg-changer-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-bg-pick {
+    flex: 1;
+    min-width: 110px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: center;
+}
+
+.btn-bg-pick:hover { background: rgba(255,255,255,0.2); }
+
+.btn-bg-reset {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,100,100,0.35);
+    background: rgba(255,80,80,0.1);
+    color: rgba(255,180,180,1);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-bg-reset:hover { background: rgba(255,80,80,0.22); }
+
+#bg-file-input { display: none; }
+
+.bg-preview-name {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    word-break: break-all;
+}
+
+.bottom-row {
+    position: fixed;
+    bottom: 18px;
+    left: 0;
+    width: 100%;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.78);
+    pointer-events: none;
+}
+
+.bottom-row div { pointer-events: auto; }
+
+.bottom-row a {
+    color: rgba(255,255,255,0.78);
+    text-decoration: none;
+}
+
+.bottom-row a:hover { text-decoration: underline; }
+
+.hidden { display: none; }
+
+@media (max-width: 600px) {
+    .content-layer { padding: 16px 12px 70px; }
+    .top-badge { left: 50%; transform: translateX(-50%); }
+    .bottom-row {
+        padding: 0 14px;
+        font-size: 11px;
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="page-root">
+    <div class="bg-image" id="bg-image"></div>
+    <div class="bg-gradient"></div>
+
+    <div class="content-layer">
+        <div class="top-badge">Multi-service image search</div>
+
+        <div class="main-layout">
+            <div class="card-wrapper">
+
+                <div class="card" id="panel-main">
+                    <div class="card-header">
+                        <div class="card-title">iqdb+ <span class="version">/ designed</span></div>
+                        <button type="button" id="btn-about-main">about</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="hint-text">Upload an image or thumbnail from a file or URL to find it (or similar images).</div>
+
+                        <form id="iqdb-form" action="https://iqdb.org/" method="post" enctype="multipart/form-data">
+                            <label class="upload-box" id="upload-box">
+                                <div class="upload-icon">☁️</div>
+                                <div style="margin-top:10px;font-size:20px;font-weight:600;">Drag &amp; drop your image</div>
+                                <div style="opacity:0.7;">or paste (Ctrl+V)</div>
+                                <div class="upload-btn" id="upload-btn">Choose file</div>
+                                <input type="file" id="file-input" name="file" accept="image/*">
+                            </label>
+
+                            <div class="input-wrapper">
+                                <label for="url-input">source url...</label>
+                                <input id="url-input" class="text-input" type="text" name="url" placeholder="https://example.com/image.jpg">
+                            </div>
+
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="ignore-colors" name="ignore_colors" value="1">
+                                <span>ignore colors</span>
+                            </label>
+
+                            <button type="submit" class="btn-primary">SEARCH</button>
+
+                            <div class="card-footer-text">
+                                Supported file types are JPEG, PNG and GIF<br>
+                                Maximum file size: 8192 KB<br>
+                                Maximum image dimensions: 7500x7500
+                            </div>
+                        </form>
+
+                        <div class="bg-changer">
+                            <div class="bg-changer-title">Background image</div>
+                            <div class="bg-changer-btns">
+                                <button class="btn-bg-pick" id="btn-bg-pick">Choose image</button>
+                                <button class="btn-bg-reset" id="btn-bg-reset">Reset to default</button>
+                            </div>
+                            <div class="bg-preview-name" id="bg-preview-name"></div>
+                            <input type="file" id="bg-file-input" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="panel-about">
+                    <div class="card-header">
+                        <div class="card-title">iqdb+ <span class="version">/ about</span></div>
+                        <button type="button" id="btn-back">back</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="about-text">
+                            This is a custom redesign UI for iqdb.org.<br>
+                            All rights belong to the original iqdb.org creators.<br><br>
+                            This page only sends your request to the real iqdb.org service.
+                        </div>
+                        <a class="btn-github" href="https://github.com/yuriori-d" target="_blank" rel="noopener noreferrer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.207 11.387.6.113.793-.26.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            GitHub — yuriori-d
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="bottom-row">
+            <div>Supported services: Danbooru, Konachan, yande.re, Gelbooru, Sankaku Channel, e-shuushuu, Zerochan, Anime-Pictures</div>
+            <div>art by <a href="https://www.pixiv.net/en/users/62454088" target="_blank" rel="noopener noreferrer">冬灯</a></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const panelMain    = document.getElementById('panel-main');
+    const panelAbout   = document.getElementById('panel-about');
+    const btnAboutMain = document.getElementById('btn-about-main');
+    const btnBack      = document.getElementById('btn-back');
+
+    btnAboutMain.addEventListener('click', () => {
+        panelMain.classList.add('hidden');
+        panelAbout.classList.remove('hidden');
+    });
+
+    btnBack.addEventListener('click', () => {
+        panelAbout.classList.add('hidden');
+        panelMain.classList.remove('hidden');
+    });
+
+    const uploadBox = document.getElementById('upload-box');
+    const fileInput = document.getElementById('file-input');
+    const uploadBtn = document.getElementById('upload-btn');
+    const form      = document.getElementById('iqdb-form');
+
+    fileInput.addEventListener('change', () => {
+        uploadBtn.textContent = fileInput.files.length ? fileInput.files[0].name : 'Choose file';
+    });
+
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.style.background = 'rgba(255,255,255,0.2)';
+    });
+
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.style.background = 'rgba(255,255,255,0.08)';
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.style.background = 'rgba(255,255,255,0.08)';
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            fileInput.files = dt.files;
+            uploadBtn.textContent = e.dataTransfer.files[0].name;
+        }
+    });
+
+    document.addEventListener('paste', (e) => {
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+        for (let item of items) {
+            if (item.type && item.type.startsWith('image/')) {
+                const blob = item.getAsFile();
+                if (!blob) continue;
+                const pastedFile = new File([blob], 'pasted_image.png', { type: blob.type });
+                const dt = new DataTransfer();
+                dt.items.add(pastedFile);
+                fileInput.files = dt.files;
+                uploadBtn.textContent = pastedFile.name;
+                uploadBox.style.background = 'rgba(255,255,255,0.2)';
+                setTimeout(() => { uploadBox.style.background = 'rgba(255,255,255,0.08)'; }, 300);
+                break;
+            }
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        if (!panelAbout.classList.contains('hidden')) return;
+        const active = document.activeElement;
+        if (active && active.tagName === 'INPUT') return;
+        form.submit();
+    });
+
+    const bgImage       = document.getElementById('bg-image');
+    const bgFileInput   = document.getElementById('bg-file-input');
+    const btnBgPick     = document.getElementById('btn-bg-pick');
+    const btnBgReset    = document.getElementById('btn-bg-reset');
+    const bgPreviewName = document.getElementById('bg-preview-name');
+
+    const BG_STORAGE_KEY = 'iqdbplus_bg_image';
+    const BG_NAME_KEY    = 'iqdbplus_bg_name';
+    const DEFAULT_BG     = 'url("https://files.yande.re/image/3416edf8138ad271771cc89351995029/yande.re%20852783%20iranon_%28new_iranon%29%20mishaguji%20moriya_suwako%20touhou.jpg")';
+
+    function loadSavedBg() {
+        try {
+            const saved = localStorage.getItem(BG_STORAGE_KEY);
+            const name  = localStorage.getItem(BG_NAME_KEY);
+            if (saved) {
+                bgImage.style.backgroundImage = `url("${saved}")`;
+                bgPreviewName.textContent = name ? `Current: ${name}` : '';
+            }
+        } catch (e) {}
+    }
+
+    loadSavedBg();
+
+    btnBgPick.addEventListener('click', () => { bgFileInput.click(); });
+
+    bgFileInput.addEventListener('change', () => {
+        const file = bgFileInput.files && bgFileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            bgImage.style.backgroundImage = `url("${dataUrl}")`;
+            bgPreviewName.textContent = `Current: ${file.name}`;
+            try {
+                localStorage.setItem(BG_STORAGE_KEY, dataUrl);
+                localStorage.setItem(BG_NAME_KEY, file.name);
+            } catch (err) {
+                bgPreviewName.textContent = '⚠️ Image too large to save (will reset on reload)';
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+
+    btnBgReset.addEventListener('click', () => {
+        bgImage.style.backgroundImage = DEFAULT_BG;
+        bgPreviewName.textContent = '';
+        try {
+            localStorage.removeItem(BG_STORAGE_KEY);
+            localStorage.removeItem(BG_NAME_KEY);
+        } catch (e) {}
+    });
+</script>
+
+</body>
+</html>
